@@ -9,4 +9,14 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.listen(PORT, () => console.log(`> I'm listening`))
+app.use('/students', require('./api/students'))
+
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500)
+})
+
+app.listen(PORT, () => {
+  console.log(`> I'm listening (:`)
+  console.log(`> http://localhost:${PORT}`)
+})
