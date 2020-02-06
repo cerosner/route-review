@@ -1,41 +1,51 @@
 const router = require('express').Router()
+const { Students, Tests } = require('../db')
 
-const tests = [
-  { id: 1, subject: 'English', score: 78, studentId: 1 },
-  { id: 2, subject: 'Math', score: 89, studentId: 1 },
-  { id: 3, subject: 'History', score: 95, studentId: 1}
-]
+router.get('/', (req, res, next) => res.json(Tests))
 
-router.get('/', (req, res, next) => res.json(tests))
+router.get('/top', (req, res, next) => {
+  let topScore = Tests.reduce((prev, current) => prev.score > current.score ? prev : current)
+
+  res.json(Students[topScore.studentId])
+})
 
 router.get('/:id', (req, res, next) => {
-  res.json(tests[req.params.id - 1])
+  res.json(Tests[req.params.id])
+})
+
+router.get('/:studentId/mean', (req, res, next) => {
+  let studentTests = Tests.filter(test => test.studentId === Number(req.params.studentId))
+
+  let scoreTotal = studentTests.reduce((accum, test) => {
+    return accum + test.score
+  }, 0)
+
+  res.json(scoreTotal / studentTests.length)
 })
 
 router.post('/', (req, res, next) => {
-  let newId = tests.length + 1
+  let newId = Tests.length
   let { subject, score, studentId } = req.body
 
-  tests.push({ newId, subject, score, studentId })
-  res.json(tests)
+  Tests.push({ id: newId, subject, score, studentId: Number(studentId) })
+  res.json(Tests)
 })
 
 router.put('/:id', (req, res, next) => {
-  let updateTest = tests[req.params.id - 1]
+  let updateTest = Tests[req.params.id]
   let { subject, score, studentId } = req.body
 
   if (subject) updateTest.subject = subject
   if (score) updateTest.score = score
   if (studentId) updateTest.studentId = studentId
 
-  res.json(tests)
+  res.json(Tests)
 })
 
 router.delete('/:id', (req, res, next) => {
-  tests.splice(req.params.id - 1, 1)
+  Tests.splice(req.params.id, 1)
 
-  console.log(tests)
-  res.json(tests)
+  res.json(Tests)
 })
 
 module.exports = router

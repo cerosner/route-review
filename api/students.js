@@ -1,36 +1,32 @@
 const router = require('express').Router()
+const { Students } = require('../db')
 
-const students = [
-  { id: 1, name: 'Dan' },
-  { id: 2, name: 'Karen' },
-  { id: 3, name: 'John' }
-]
-
-router.get('/', (req, res, next) => res.json(students))
+router.get('/', (req, res, next) => res.json(Students))
 
 router.get('/:id', (req, res, next) => {
-  res.json(students[req.params.id - 1])
+  res.json(Students[req.params.id])
 })
 
 router.post('/', (req, res, next) => {
-  let newId = students.length + 1
+  let newId = Students.length
   let { name } = req.body
 
-  students.push({ newId, name })
-  res.json(students)
+  Students.push({ id: newId, name })
+  res.json(Students)
 })
 
 router.put('/:id', (req, res, next) => {
-  let updateStudent = students[req.params.id - 1]
+  let updateStudent = Students[req.params.id]
 
   updateStudent.name = req.body.name
-  res.json(students)
+  Students[req.params.id] = updateStudent
+  res.json(Students)
 })
 
 router.delete('/:id', (req, res, next) => {
-  students.splice(req.params.id - 1, 1)
+  Students.splice(req.params.id, 1)
 
-  res.json(students)
+  res.json(Students)
 })
 
 module.exports = router
